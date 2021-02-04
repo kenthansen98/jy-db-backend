@@ -1,0 +1,17 @@
+{
+  "name": "jy-db-backend",
+  "version": "1.0.0",
+  "description": "Backend for jy-db application",
+  "main": "jy-db-backend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kent Hansen",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.19.2",
+    "graphql": "^14.7.0",
+    "mongoose": "^5.11.15",
+    "mongoose-unique-validator": "^2.0.3"
+  }
+}
