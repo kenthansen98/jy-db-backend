@@ -56,7 +56,7 @@ const typeDefs = gql`
 
     type Query {
         allGroups: [Group!]!
-        findGroup(name: String!): Group
+        findGroup(id: ID!): Group
     }
 
     type Mutation {
@@ -74,7 +74,7 @@ const resolvers = {
             return Group.find({});
         },
         findGroup: (root, args) => {
-            return Group.findOne({ name: args.name });
+            return Group.findOne({ _id: args.id });
         },
     },
     Group: {
