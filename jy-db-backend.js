@@ -65,6 +65,10 @@ const typeDefs = gql`
             participants: [ParticipantInput]
             animators: [AnimatorInput!]!
         ): Group
+        addConversation(
+            animatorId: ID!
+            summary: String!
+        ): Animator
     }
 `;
 
@@ -74,7 +78,7 @@ const resolvers = {
             return Group.find({});
         },
         findGroup: (root, args) => {
-            return Group.findOne({ _id: args.id });
+            return Group.findById(args.id);
         },
     },
     Group: {
@@ -120,6 +124,22 @@ const resolvers = {
                 });
             }
             return group;
+        },
+        addConversation: async (root, args) => {
+            const animator = await Animator.findById(args.animatorId);
+
+            if (!animator) {
+                return null;
+            }
+            animator.conversations = animator.conversations.concat(args.summary);
+            try {
+                await animator.save();
+            } catch (error) {
+                throw new UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return animator;
         },
     },
 };
