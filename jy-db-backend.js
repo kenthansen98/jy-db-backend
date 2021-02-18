@@ -64,11 +64,29 @@ const typeDefs = gql`
             name: String!
             participants: [ParticipantInput]
             animators: [AnimatorInput!]!
-        ): Group
+        ) : Group
+        editGroup(
+            groupId: ID!
+            name: String
+            participants: [ParticipantInput]
+            animators: [AnimatorInput]
+        ) : Group
+        deleteGroup(
+            groupId: ID!
+        ) : Group
         addConversation(
             animatorId: ID!
             summary: String!
-        ): Animator
+        ) : Animator
+        editConversation(
+            animatorId: ID!
+            summary: String!
+            index: Int!
+        ) : Animator
+        deleteConversation(
+            animatorId: ID!
+            index: Int!
+        ) : Animator
     }
 `;
 
@@ -125,6 +143,52 @@ const resolvers = {
             }
             return group;
         },
+        editGroup: async (root, args) => {
+            const group = await Group.findById(args.groupId);
+            if (!group) {
+                return null;
+            }
+            if (args.name) {
+                group.name = args.name;
+            }
+            const parsedArgs = JSON.parse(JSON.stringify(args));
+            if (args.participants) {
+                const participants = parsedArgs.participants.map(
+                    (participant) =>
+                        new Participant({
+                            name: participant.name,
+                            age: participant.age,
+                        })
+                );
+                group.participants = participants;
+            }
+            if (args.animators) {
+                const animators = parsedArgs.animators.map(
+                    (animator) =>
+                        new Animator({
+                            name: animator.name, 
+                            conversations: animator.conversations, 
+                        })
+                );
+                group.animators = animators;
+            }
+
+            try {
+                await group.save();
+            } catch (error) {
+                throw new UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return group;
+        },
+        deleteGroup: async (root, args) => {
+            const group = await Group.findByIdAndDelete(args.groupId);
+            if (!group) {
+                return null;
+            }
+            return group;
+        },
         addConversation: async (root, args) => {
             const animator = await Animator.findById(args.animatorId);
 
@@ -137,6 +201,38 @@ const resolvers = {
             } catch (error) {
                 throw new UserInputError(error.message, {
                     invalidArgs: args,
+                });
+            }
+            return animator;
+        },
+        editConversation: async (root, args) => {
+            const animator = await Animator.findById(args.animatorId);
+            if (!animator) {
+                return null;
+            }
+            if (args.index < animator.conversations.length) {
+                animator.conversations.splice(args.index, 1, args.summary);
+            }
+            try {
+                await animator.save();
+            } catch (error) {
+                throw new UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return animator;
+        },
+        deleteConversation: async (root, args) => {
+            const animator = await Animator.findById(args.animatorId);
+            if (!animator) {
+                return null;
+            }
+            animator.conversations.splice(args.index, 1);
+            try {
+                await animator.save();
+            } catch (error) {
+                throw new UserInputError(error.message, {
+                    invalidArgs: args, 
                 });
             }
             return animator;
