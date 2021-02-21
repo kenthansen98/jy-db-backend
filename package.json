@@ -4,6 +4,7 @@
   "description": "Backend for jy-db application",
   "main": "jy-db-backend.js",
   "scripts": {
+    "start": "node jy-db-backend.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kent Hansen",
