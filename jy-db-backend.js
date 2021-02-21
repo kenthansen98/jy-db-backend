@@ -1,12 +1,12 @@
 const { ApolloServer, gql, UserInputError } = require("apollo-server");
 const mongoose = require("mongoose");
+require("dotenv").config()
 
 const Participant = require("./models/participant");
 const Animator = require("./models/animator");
 const Group = require("./models/group");
 
-const MONGODB_URI =
-    "mongodb+srv://kenthansen:cRGVpglXC1GY9fqg@cluster0.dkrph.mongodb.net/jy-db?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.URI;
 
 console.log("connecting to ", MONGODB_URI);
 
@@ -245,6 +245,6 @@ const server = new ApolloServer({
     resolvers,
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
     console.log(`Server ready at ${url}`);
 });
